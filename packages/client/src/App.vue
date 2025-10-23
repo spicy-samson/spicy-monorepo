@@ -5,6 +5,7 @@ import { db } from "./lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
 const message = ref("");
+const message_farewell = ref("");
 
 async function fetchFirestore() {
   try {
@@ -24,9 +25,16 @@ async function fetchGreeting() {
   message.value = res.greeting;
 }
 
+async function sayGoodbye() {
+  const res = await trpc.goodbye.query('tres');
+  message_farewell.value = res.farewell
+  
+}
+
 onMounted(async () => {
   await fetchFirestore();
   await fetchGreeting();
+  await sayGoodbye();
 });
 </script>
 
@@ -40,6 +48,7 @@ onMounted(async () => {
     </div>
     <h1 class="text-3xl font-bold mb-2">Tailwind v3 working in Vue!</h1>
     <h2 class="text-xl font-semibold mb-4">Firestore Connection Test</h2>
+    <h2 class="text-xl font-semibold mb-4">{{ message_farewell }}</h2>
   </div>
 </template>
 
