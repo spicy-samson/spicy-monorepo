@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@trpc/client": "^11.6.0",
     "firebase": "^12.4.0",
     "pinia": "^3.0.3",
     "vue": "^3.5.22",
