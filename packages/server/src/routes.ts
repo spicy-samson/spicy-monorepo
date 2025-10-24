@@ -41,6 +41,26 @@ export const appRouter = router({
     }
   }),
 
+  updateProduct: publicProcedure
+  .input(z.object({
+    id: z.number(),
+    title: z.string(),
+    price: z.number(),
+    description: z.string(),
+    category: z.string(),
+    image: z.string(),
+  }))
+  .mutation(async ({ input }) => {
+    try {
+      const { id, ...updateData } = input;
+      await db.collection("products").doc(id.toString()).update(updateData);
+      return { status: "success" };
+    } catch (error) {
+      console.error("Failed to update product:", error);
+      throw new Error("Failed to update product");
+    }
+  }),
+
   // ...existing code...
   seedProducts: publicProcedure.mutation(async () => {
     const productsRef = db.collection("products");

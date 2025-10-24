@@ -30,11 +30,7 @@ function toggleMenu() {
               class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
               >Shop</router-link
             >
-            <router-link
-              to="/categories"
-              class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
-              >Categories</router-link
-            >
+
             <router-link
               to="/about"
               class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
@@ -61,7 +57,10 @@ function toggleMenu() {
 
           <!-- Mobile menu button -->
           <div class="md:hidden">
-            <button @click="toggleMenu" class="text-gray-600 hover:text-blue-600">
+            <button
+              @click="toggleMenu"
+              class="text-gray-600 hover:text-blue-600"
+            >
               <span class="sr-only">Menu</span>
               ☰
             </button>
@@ -82,11 +81,7 @@ function toggleMenu() {
             class="block text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md"
             >Shop</router-link
           >
-          <router-link
-            to="/categories"
-            class="block text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md"
-            >Categories</router-link
-          >
+
           <router-link
             to="/about"
             class="block text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md"

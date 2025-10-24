@@ -2,6 +2,10 @@
 import { ref, onMounted, computed } from "vue";
 import { trpc } from "../trpc";
 import type { Product } from "../../../shared/types";
+import UpdateProductModal from "../components/UpdateProductModal.vue";
+
+const isUpdateModalOpen = ref(false);
+const selectedProduct = ref<Product | null>(null);
 const products = ref<Product[]>([]);
 
 const selectedCategory = ref("");
@@ -9,20 +13,25 @@ const categories = ref<string[]>([]);
 
 const isSeeding = ref(false);
 
-async function seedProducts() {
-  try {
-    isSeeding.value = true;
-    const result = await trpc.seedProducts.mutate();
-    console.log("Seeding result:", result);
-    // Refresh products after seeding
-    if (result.status === "Seeded") {
-      await fetchProducts();
-    }
-  } catch (error) {
-    console.error("Failed to seed products:", error);
-  } finally {
-    isSeeding.value = false;
-  }
+// async function seedProducts() {
+//   try {
+//     isSeeding.value = true;
+//     const result = await trpc.seedProducts.mutate();
+//     console.log("Seeding result:", result);
+//     // Refresh products after seeding
+//     if (result.status === "Seeded") {
+//       await fetchProducts();
+//     }
+//   } catch (error) {
+//     console.error("Failed to seed products:", error);
+//   } finally {
+//     isSeeding.value = false;
+//   }
+// }
+
+function openUpdateModal(product: Product) {
+  selectedProduct.value = product;
+  isUpdateModalOpen.value = true;
 }
 
 async function fetchProducts() {
@@ -49,14 +58,14 @@ onMounted(async () => {
   <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-8">
       <h2 class="text-2xl font-bold text-white">Our Products</h2>
-      <button
+      <!-- <button
         @click="seedProducts"
         :disabled="isSeeding"
         class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
       >
         <span v-if="isSeeding">Seeding...</span>
         <span v-else>Seed Data</span>
-      </button>
+      </button> -->
 
       <!-- Category Dropdown -->
       <div class="relative">
@@ -100,6 +109,7 @@ onMounted(async () => {
             <span class="text-sm text-gray-500">{{ product.category }}</span>
             <div class="flex space-x-2">
               <button
+                @click="openUpdateModal(product)"
                 class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
               >
                 Update
@@ -122,6 +132,13 @@ onMounted(async () => {
       </div>
     </div>
   </div>
+  <UpdateProductModal
+    v-if="selectedProduct"
+    :product="selectedProduct"
+    :is-open="isUpdateModalOpen"
+    @close="isUpdateModalOpen = false"
+    @update-complete="fetchProducts"
+  />p
 </template>
 
 <style scoped>
