@@ -3,10 +3,14 @@ import { ref, onMounted, computed } from "vue";
 import { trpc } from "../trpc";
 import type { Product } from "../../../shared/types";
 import UpdateProductModal from "../components/UpdateProductModal.vue";
+import DeleteProductModal from "../components/DeleteProductModal.vue";
 
 const isUpdateModalOpen = ref(false);
 const selectedProduct = ref<Product | null>(null);
 const products = ref<Product[]>([]);
+// Add these with your other refs
+const isDeleteModalOpen = ref(false);
+const productToDelete = ref<Product | null>(null);
 
 const selectedCategory = ref("");
 const categories = ref<string[]>([]);
@@ -38,6 +42,18 @@ function closeUpdateModal() {
   isUpdateModalOpen.value = false;
   selectedProduct.value = null; // Reset selected product when closing
 }
+
+// Add this function
+function openDeleteModal(product: Product) {
+  productToDelete.value = product;
+  isDeleteModalOpen.value = true;
+}
+
+function closeDeleteModal() {
+  isDeleteModalOpen.value = false;
+  productToDelete.value = null;
+}
+PageRevealEvent;
 
 async function fetchProducts() {
   const res = await trpc.getProducts.query();
@@ -120,6 +136,7 @@ onMounted(async () => {
                 Update
               </button>
               <button
+                @click="openDeleteModal(product)"
                 class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
               >
                 Delete
@@ -143,6 +160,13 @@ onMounted(async () => {
     :is-open="isUpdateModalOpen"
     @close="closeUpdateModal"
     @update-complete="fetchProducts"
+  />
+  <DeleteProductModal
+    v-if="productToDelete"
+    :product="productToDelete"
+    :is-open="isDeleteModalOpen"
+    @close="closeDeleteModal"
+    @delete-complete="fetchProducts"
   />
 </template>
 
