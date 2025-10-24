@@ -34,6 +34,11 @@ function openUpdateModal(product: Product) {
   isUpdateModalOpen.value = true;
 }
 
+function closeUpdateModal() {
+  isUpdateModalOpen.value = false;
+  selectedProduct.value = null; // Reset selected product when closing
+}
+
 async function fetchProducts() {
   const res = await trpc.getProducts.query();
   products.value = res;
@@ -136,9 +141,9 @@ onMounted(async () => {
     v-if="selectedProduct"
     :product="selectedProduct"
     :is-open="isUpdateModalOpen"
-    @close="isUpdateModalOpen = false"
+    @close="closeUpdateModal"
     @update-complete="fetchProducts"
-  />p
+  />
 </template>
 
 <style scoped>

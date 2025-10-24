@@ -1,6 +1,6 @@
 <!-- src/components/UpdateProductModal.vue -->
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import type { Product } from '../../../shared/types';
 import { trpc } from '../trpc';
 
@@ -15,12 +15,30 @@ const emit = defineEmits<{
 }>();
 
 const updateForm = ref({
-  title: props.product.title,
-  price: props.product.price,
-  description: props.product.description,
-  category: props.product.category,
-  image: props.product.image,
+  title: '',
+  price: 0,
+  description: '',
+  category: '',
+  image: '',
 });
+
+// Watch for changes in the product prop and isOpen to reset the form
+watch(
+  () => ({ product: props.product, isOpen: props.isOpen }),
+  ({ product, isOpen }) => {
+    if (isOpen) {
+      // Reset form with new product data when modal opens
+      updateForm.value = {
+        title: product.title,
+        price: product.price,
+        description: product.description,
+        category: product.category,
+        image: product.image,
+      };
+    }
+  },
+  { immediate: true }
+);
 
 async function updateProduct() {
   try {
