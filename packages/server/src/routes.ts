@@ -4,7 +4,7 @@ import { db } from "./firebase";
 import type { Product } from "../../shared/types";
 // Return: Product[]
 
-const products: Product[] = [];
+
 export const appRouter = router({
   hello: publicProcedure
     .input(z.object({ name: z.string() }))
@@ -24,6 +24,7 @@ export const appRouter = router({
       return { sum: input.a + input.b };
     }),
   getProducts: publicProcedure.query(async () => {
+    const products: Product[] = [];
     try {
       const snapshot = await db.collection("products").get();
       snapshot.forEach((doc) => {
@@ -50,7 +51,7 @@ export const appRouter = router({
       const res = await fetch("https://fakestoreapi.com/products");
       const products = await res.json();
       for (const product of products) {
-          await productsRef.doc(product.id.toString()).set(product);
+        await productsRef.doc(product.id.toString()).set(product);
       }
       return { status: "Seeded", count: products.length };
     } else {
