@@ -4,7 +4,6 @@ import { db } from "./firebase";
 import type { Product } from "../../shared/types";
 // Return: Product[]
 
-
 export const appRouter = router({
   hello: publicProcedure
     .input(z.object({ name: z.string() }))
@@ -42,24 +41,42 @@ export const appRouter = router({
   }),
 
   updateProduct: publicProcedure
-  .input(z.object({
-    id: z.number(),
-    title: z.string(),
-    price: z.number(),
-    description: z.string(),
-    category: z.string(),
-    image: z.string(),
-  }))
-  .mutation(async ({ input }) => {
-    try {
-      const { id, ...updateData } = input;
-      await db.collection("products").doc(id.toString()).update(updateData);
-      return { status: "success" };
-    } catch (error) {
-      console.error("Failed to update product:", error);
-      throw new Error("Failed to update product");
-    }
-  }),
+    .input(
+      z.object({
+        id: z.number(),
+        title: z.string(),
+        price: z.number(),
+        description: z.string(),
+        category: z.string(),
+        image: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const { id, ...updateData } = input;
+        await db.collection("products").doc(id.toString()).update(updateData);
+        return { status: "success" };
+      } catch (error) {
+        console.error("Failed to update product:", error);
+        throw new Error("Failed to update product");
+      }
+    }),
+
+  deleteProduct: publicProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        await db.collection("products").doc(input.id.toString()).delete();
+        return { status: "success" };
+      } catch (error) {
+        console.error("Failed to delete product:", error);
+        throw new Error("Failed to delete product");
+      }
+    }),
 
   // ...existing code...
   seedProducts: publicProcedure.mutation(async () => {
