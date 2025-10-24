@@ -1,69 +1,113 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { trpc } from "./trpc";
-import { db } from "./lib/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { ref } from "vue";
+const isMenuOpen = ref(false);
 
-const message = ref("");
-const message_farewell = ref("");
-
-async function fetchFirestore() {
-  try {
-    const querySnapshot = await getDocs(collection(db, "testCollection"));
-    querySnapshot.forEach((doc) => {
-      console.log(`${doc.id} =>`, doc.data());
-    });
-    console.log("✅ Successfully connected to Firestore");
-    console.log(querySnapshot);
-  } catch (error) {
-    console.error("❌ Firestore connection failed:", error);
-  }
+function toggleMenu() {
+  isMenuOpen.value = !isMenuOpen.value;
 }
-
-async function fetchGreeting() {
-  const res = await trpc.hello.query({ name: "Third" });
-  message.value = res.greeting;
-}
-
-async function sayGoodbye() {
-  const res = await trpc.goodbye.query('tres');
-  message_farewell.value = res.farewell
-  
-}
-
-onMounted(async () => {
-  await fetchFirestore();
-  await fetchGreeting();
-  await sayGoodbye();
-});
 </script>
 
 <template>
-  <div
-    class="min-h-screen flex flex-col items-center justify-center bg-blue-600 text-white"
-  >
-    <div class="flex items-center space-x-4 mb-6">
-      <span class="text-4xl">🚀</span>
-      <span class="text-orange-400 text-3xl font-bold">{{ message }}</span>
-    </div>
-    <h1 class="text-3xl font-bold mb-2">Tailwind v3 working in Vue!</h1>
-    <h2 class="text-xl font-semibold mb-4">Firestore Connection Test</h2>
-    <h2 class="text-xl font-semibold mb-4">{{ message_farewell }}</h2>
+  <div class="min-h-screen flex flex-col bg-blue-600">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg w-full">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+          <!-- Logo/Brand -->
+          <div class="flex-shrink-0 flex items-center">
+            <h1 class="text-xl font-bold text-blue-600">SpicyStore</h1>
+          </div>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden md:flex space-x-8">
+            <router-link
+              to="/"
+              class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
+              >Home</router-link
+            >
+            <router-link
+              to="/shop"
+              class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
+              >Shop</router-link
+            >
+            <router-link
+              to="/categories"
+              class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
+              >Categories</router-link
+            >
+            <router-link
+              to="/about"
+              class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
+              >About</router-link
+            >
+            <router-link
+              to="/contact"
+              class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
+              >Contact</router-link
+            >
+          </div>
+
+          <!-- Shopping Cart & User -->
+          <div class="hidden md:flex items-center space-x-4">
+            <button class="text-gray-600 hover:text-blue-600">
+              <span class="sr-only">Shopping Cart</span>
+              🛒
+            </button>
+            <button class="text-gray-600 hover:text-blue-600">
+              <span class="sr-only">User Account</span>
+              👤
+            </button>
+          </div>
+
+          <!-- Mobile menu button -->
+          <div class="md:hidden">
+            <button @click="toggleMenu" class="text-gray-600 hover:text-blue-600">
+              <span class="sr-only">Menu</span>
+              ☰
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Navigation -->
+      <div v-show="isMenuOpen" class="md:hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+          <router-link
+            to="/"
+            class="block text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md"
+            >Home</router-link
+          >
+          <router-link
+            to="/shop"
+            class="block text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md"
+            >Shop</router-link
+          >
+          <router-link
+            to="/categories"
+            class="block text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md"
+            >Categories</router-link
+          >
+          <router-link
+            to="/about"
+            class="block text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md"
+            >About</router-link
+          >
+          <router-link
+            to="/contact"
+            class="block text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md"
+            >Contact</router-link
+          >
+          <div class="flex space-x-4 px-3 py-2">
+            <button class="text-gray-600 hover:text-blue-600">🛒</button>
+            <button class="text-gray-600 hover:text-blue-600">👤</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow">
+      <router-view />
+    </main>
   </div>
 </template>
-
-<style scoped>
-h1 {
-  margin-bottom: 1rem;
-}
-ul {
-  list-style: none;
-  padding: 0;
-}
-li {
-  margin-bottom: 0.5rem;
-}
-button {
-  margin-left: 1rem;
-}
-</style>
