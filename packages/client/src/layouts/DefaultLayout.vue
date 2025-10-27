@@ -1,9 +1,27 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { auth } from "../lib/firebase";
+import { useRouter } from "vue-router";
+import { signOut } from "firebase/auth";
+
+const router = useRouter();
 const isMenuOpen = ref(false);
 
 function toggleMenu() {
   isMenuOpen.value = !isMenuOpen.value;
+}
+
+async function signOutUser() {
+  try {
+    await signOut(auth);
+    router.push("/login");
+    alert("Signed out!");
+
+    // Optionally, redirect or update UI here
+  } catch (error) {
+    alert("Sign out failed!");
+    console.error(error);
+  }
 }
 </script>
 
@@ -53,6 +71,12 @@ function toggleMenu() {
               <span class="sr-only">User Account</span>
               👤
             </button>
+            <button
+              @click="signOutUser"
+              class="text-gray-600 hover:text-red-600 px-3 py-2 rounded-md font-medium"
+            >
+              Sign Out
+            </button>
           </div>
 
           <!-- Mobile menu button -->
@@ -95,6 +119,12 @@ function toggleMenu() {
           <div class="flex space-x-4 px-3 py-2">
             <button class="text-gray-600 hover:text-blue-600">🛒</button>
             <button class="text-gray-600 hover:text-blue-600">👤</button>
+            <button
+              @click="signOutUser"
+              class="text-gray-600 hover:text-red-600 px-3 py-2 rounded-md font-medium"
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       </div>

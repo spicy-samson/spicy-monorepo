@@ -17,21 +17,21 @@ const categories = ref<string[]>([]);
 
 const isSeeding = ref(false);
 
-// async function seedProducts() {
-//   try {
-//     isSeeding.value = true;
-//     const result = await trpc.seedProducts.mutate();
-//     console.log("Seeding result:", result);
-//     // Refresh products after seeding
-//     if (result.status === "Seeded") {
-//       await fetchProducts();
-//     }
-//   } catch (error) {
-//     console.error("Failed to seed products:", error);
-//   } finally {
-//     isSeeding.value = false;
-//   }
-// }
+async function seedProducts() {
+  try {
+    isSeeding.value = true;
+    const result = await trpc.seedProducts.mutate();
+    console.log("Seeding result:", result);
+    // Refresh products after seeding
+    if (result.status === "Seeded") {
+      await fetchProducts();
+    }
+  } catch (error) {
+    console.error("Failed to seed products:", error);
+  } finally {
+    isSeeding.value = false;
+  }
+}
 
 function openUpdateModal(product: Product) {
   selectedProduct.value = product;
@@ -79,14 +79,14 @@ onMounted(async () => {
   <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-8">
       <h2 class="text-2xl font-bold text-white">Our Products</h2>
-      <!-- <button
+      <button
         @click="seedProducts"
         :disabled="isSeeding"
         class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
       >
         <span v-if="isSeeding">Seeding...</span>
         <span v-else>Seed Data</span>
-      </button> -->
+      </button>
 
       <!-- Category Dropdown -->
       <div class="relative">

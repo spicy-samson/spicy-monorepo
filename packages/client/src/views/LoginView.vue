@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../lib/firebase";
 
 const router = useRouter();
 const isLoading = ref(false);
@@ -14,8 +16,12 @@ async function handleLogin() {
   try {
     isLoading.value = true;
     // TODO: Add Firebase authentication logic here
-    // const result = await signInWithEmailAndPassword(auth, loginForm.value.email, loginForm.value.password);
-    router.push("/home");
+    const result = await signInWithEmailAndPassword(
+      auth,
+      loginForm.value.email,
+      loginForm.value.password
+    );
+    router.push("/");
   } catch (error: any) {
     errorMessage.value = error.message;
   } finally {
@@ -29,7 +35,7 @@ async function handleLogin() {
     <div class="card w-full max-w-md bg-base-100 shadow-xl">
       <div class="card-body">
         <h2 class="card-title text-2xl font-bold text-center text-primary mb-6">
-          Welcome to SpicyStore
+          Welcome to Store
         </h2>
 
         <!-- Error Alert -->
@@ -75,7 +81,7 @@ async function handleLogin() {
             <input
               v-model="loginForm.password"
               type="password"
-              placeholder="••••••••"
+              placeholder=""
               class="input input-bordered w-full"
               required
             />
