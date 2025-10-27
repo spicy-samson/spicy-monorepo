@@ -14,7 +14,7 @@ function toggleMenu() {
 async function signOutUser() {
   try {
     await signOut(auth);
-    router.push("/login");
+    router.push("/");
     alert("Signed out!");
 
     // Optionally, redirect or update UI here
@@ -39,7 +39,7 @@ async function signOutUser() {
           <!-- Desktop Navigation -->
           <div class="hidden md:flex space-x-8">
             <router-link
-              to="/"
+              to="/home"
               class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md font-medium"
               >Home</router-link
             >
@@ -99,7 +99,7 @@ async function signOutUser() {
       <div v-show="isMenuOpen" class="md:hidden">
         <div class="px-2 pt-2 pb-3 space-y-1">
           <router-link
-            to="/"
+            to="/home"
             class="block text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md"
             >Home</router-link
           >

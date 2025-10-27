@@ -49,7 +49,7 @@ async function handleRegister() {
     }
 
     isLoading.value = true;
-    // TODO: Add Firebase registration logic here
+
     const result = await createUserWithEmailAndPassword(
       auth,
       registerForm.value.email,
@@ -83,7 +83,7 @@ async function handleRegister() {
       createdAt: new Date(),
     });
 
-    router.push("/");
+    router.push("/home");
   } catch (error: any) {
     errorMessage.value = error.message;
   } finally {
@@ -236,9 +236,7 @@ async function handleRegister() {
           <!-- Sign In Link -->
           <div class="text-center text-sm">
             <span class="text-base-content">Already have an account? </span>
-            <router-link to="/login" class="link link-primary"
-              >Sign in</router-link
-            >
+            <router-link to="/" class="link link-primary">Sign in</router-link>
           </div>
         </form>
       </div>

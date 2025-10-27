@@ -12,7 +12,7 @@ const error = ref("");
 onMounted(async () => {
   const currentUser = auth.currentUser;
   if (!currentUser) {
-    router.push("/login");
+    router.push("/");
     return;
   }
   try {

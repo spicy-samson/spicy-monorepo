@@ -21,7 +21,7 @@ async function handleLogin() {
       loginForm.value.email,
       loginForm.value.password
     );
-    router.push("/");
+    router.push("/home");
   } catch (error: any) {
     errorMessage.value = error.message;
   } finally {
