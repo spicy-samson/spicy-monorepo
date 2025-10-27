@@ -67,10 +67,13 @@ async function signOutUser() {
               <span class="sr-only">Shopping Cart</span>
               🛒
             </button>
-            <button class="text-gray-600 hover:text-blue-600">
+            <router-link
+              to="/profile"
+              class="text-gray-600 hover:text-blue-600"
+            >
               <span class="sr-only">User Account</span>
               👤
-            </button>
+            </router-link>
             <button
               @click="signOutUser"
               class="text-gray-600 hover:text-red-600 px-3 py-2 rounded-md font-medium"

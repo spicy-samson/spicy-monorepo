@@ -56,6 +56,11 @@ async function handleRegister() {
       registerForm.value.password
     );
 
+    if (!result || !result.user) {
+      errorMessage.value = "User registration failed. Please try again.";
+      return;
+    }
+
     let photoURL = "";
     if (photoFile.value) {
       const filePath = `users/${result.user.uid}/profile.jpg`;

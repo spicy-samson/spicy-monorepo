@@ -1,7 +1,8 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
-import { appRouter } from "./routes";
+import { appRouter } from "./trpc/routes";
+import { createContext } from "./trpc/context";
 // import { createContext } from "./context"; // adjust as needed
 
 const server = Fastify({
@@ -13,10 +14,12 @@ const start = async () => {
     origin: "*",
   });
 
-  server.register(fastifyTRPCPlugin, {
+  await server.register(fastifyTRPCPlugin, {
     prefix: "/trpc",
-
-    trpcOptions: { router: appRouter },
+    trpcOptions: {
+      router: appRouter,
+      createContext, // ✅ add this
+    },
   });
   try {
     await server.listen({ port: 3000 });
