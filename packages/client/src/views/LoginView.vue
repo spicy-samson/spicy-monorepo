@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth } from "../lib/firebase";
 
 const router = useRouter();
@@ -21,6 +25,19 @@ async function handleLogin() {
       loginForm.value.email,
       loginForm.value.password
     );
+    router.push("/home");
+  } catch (error: any) {
+    errorMessage.value = error.message;
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+async function handleGoogleLogin() {
+  try {
+    isLoading.value = true;
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
     router.push("/home");
   } catch (error: any) {
     errorMessage.value = error.message;
@@ -107,7 +124,12 @@ async function handleLogin() {
 
           <!-- Social Login Buttons -->
           <div class="space-y-2">
-            <button type="button" class="btn btn-outline w-full gap-2">
+            <button
+              type="button"
+              class="btn btn-outline w-full gap-2"
+              :disabled="isLoading"
+              @click="handleGoogleLogin"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="h-6 w-6"
