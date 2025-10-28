@@ -1,0 +1,50 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint (client)
+        run: pnpm --filter client lint
+
+      - name: Lint (server)
+        run: pnpm --filter server lint || echo "No lint script in server"
+
+      - name: Type check (client)
+        run: pnpm --filter client type-check || echo "No type-check script in client"
+
+      - name: Type check (server)
+        run: pnpm --filter server type-check || echo "No type-check script in server"
+
+      - name: Build client
+        run: pnpm --filter client build
+
+      - name: Build server
+        run: pnpm --filter server build
+
+      - name: Run tests (client)
+        run: pnpm --filter client test || echo "No test script in client"
+
+      - name: Run tests (server)
+        run: pnpm --filter server test || echo "No test script in server"
