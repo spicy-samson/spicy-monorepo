@@ -29,25 +29,15 @@ const emit = defineEmits<{
       <div class="mt-4 flex items-center justify-between">
         <span class="text-blue-600 font-bold">${{ product.price }}</span>
         <span class="text-sm text-gray-500">{{ product.category }}</span>
-        <div class="flex space-x-2">
-          <button
-            @click="emit('update', product)"
-            class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-          >
-            Update
-          </button>
-          <button
-            @click="emit('delete', product)"
-            class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Delete
-          </button>
-        </div>
       </div>
       <div class="mt-2 flex items-center text-sm text-gray-500">
         <span
           >Rating: {{ product.rating.rate }} ({{ product.rating.count }})</span
         >
+      </div>
+      <!-- Actions slot for Add to Cart button -->
+      <div class="mt-4">
+        <slot name="actions"></slot>
       </div>
     </div>
   </div>

@@ -3,142 +3,128 @@ import { ref, onMounted, computed } from "vue";
 import { trpc } from "../trpc";
 import type { Product } from "../../../shared/types";
 import ProductCard from "../components/ProductCard.vue";
-import UpdateProductModal from "../components/UpdateProductModal.vue";
-import DeleteProductModal from "../components/DeleteProductModal.vue";
-const isUpdateModalOpen = ref(false);
-const selectedProduct = ref<Product | null>(null);
-const products = ref<Product[]>([]);
-// Add these with your other refs
-const isDeleteModalOpen = ref(false);
-const productToDelete = ref<Product | null>(null);
+import { useCartStore } from "../stores/cart";
 
+const products = ref<Product[]>([]);
 const selectedCategory = ref("");
 const categories = ref<string[]>([]);
+const cart = useCartStore();
+const cartMessage = ref("");
 
-const isSeeding = ref(false);
-
-async function seedProducts() {
-  try {
-    isSeeding.value = true;
-    const result = await trpc.seedProducts.mutate();
-    console.log("Seeding result:", result);
-    // Refresh products after seeding
-    if (result.status === "Seeded") {
-      await fetchProducts();
-    }
-  } catch (error) {
-    console.error("Failed to seed products:", error);
-  } finally {
-    isSeeding.value = false;
-  }
+function addToCart(product: Product) {
+  cart.addToCart(product);
+  cartMessage.value = `${product.title} added to cart!`;
+  setTimeout(() => (cartMessage.value = ""), 2000);
 }
-
-function openUpdateModal(product: Product) {
-  selectedProduct.value = product;
-  isUpdateModalOpen.value = true;
-}
-
-function closeUpdateModal() {
-  isUpdateModalOpen.value = false;
-  selectedProduct.value = null; // Reset selected product when closing
-}
-
-// Add this function
-function openDeleteModal(product: Product) {
-  productToDelete.value = product;
-  isDeleteModalOpen.value = true;
-}
-
-function closeDeleteModal() {
-  isDeleteModalOpen.value = false;
-  productToDelete.value = null;
-}
-PageRevealEvent;
 
 async function fetchProducts() {
   const res = await trpc.getProducts.query();
   products.value = res;
-  // Extract unique categories from products
-  categories.value = [...new Set(res.map((product) => product.category))];
+  categories.value = [...new Set(res.map((p) => p.category))];
 }
 
-// Computed products filtered by category
-const filteredProducts = computed(() => {
-  if (!selectedCategory.value) return products.value;
-  return products.value.filter(
-    (product) => product.category === selectedCategory.value
-  );
-});
+const filteredProducts = computed(() =>
+  !selectedCategory.value
+    ? products.value
+    : products.value.filter((p) => p.category === selectedCategory.value)
+);
 
-onMounted(async () => {
-  fetchProducts();
-});
+onMounted(fetchProducts);
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <div class="flex justify-between items-center mb-8">
-      <h2 class="text-2xl font-bold text-white">Our Products</h2>
-      <button
-        @click="seedProducts"
-        :disabled="isSeeding"
-        class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+  <div
+    class="min-h-screen bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-200 py-14"
+  >
+    <div class="container mx-auto px-6">
+      <!-- Header Section -->
+      <div
+        class="flex flex-col md:flex-row md:justify-between md:items-center mb-12 gap-6"
       >
-        <span v-if="isSeeding">Seeding...</span>
-        <span v-else>Seed Data</span>
-      </button>
-
-      <!-- Category Dropdown -->
-      <div class="relative">
-        <select
-          v-model="selectedCategory"
-          class="bg-white text-gray-800 pl-4 pr-8 py-2 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <h2
+          class="text-4xl font-extrabold text-yellow-700 tracking-tight drop-shadow-sm"
         >
-          <option value="">All Categories</option>
-          <option
-            v-for="category in categories"
-            :key="category"
-            :value="category"
+          🛍️ Shop Our Collection
+        </h2>
+
+        <!-- Category Dropdown -->
+        <div class="relative">
+          <select
+            v-model="selectedCategory"
+            class="bg-white text-yellow-700 font-medium pl-4 pr-10 py-2 rounded-xl shadow-md hover:shadow-lg border border-yellow-300 focus:outline-none focus:ring-4 focus:ring-yellow-400 transition-all"
           >
-            {{ category }}
-          </option>
-        </select>
+            <option value="">All Categories</option>
+            <option
+              v-for="category in categories"
+              :key="category"
+              :value="category"
+            >
+              {{ category }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Cart Message -->
+      <transition name="fade">
+        <div
+          v-if="cartMessage"
+          class="fixed top-16 left-1/2 transform -translate-x-1/2 z-50"
+          style="width: 90vw; max-width: 420px"
+        >
+          <div
+            class="bg-green-500 text-white px-6 py-3 rounded-full shadow-lg text-center font-semibold text-lg animate-bounce"
+          >
+            {{ cartMessage }}
+          </div>
+        </div>
+      </transition>
+
+      <!-- Product Grid -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10"
+      >
+        <ProductCard
+          v-for="product in filteredProducts"
+          :key="product.id"
+          :product="product"
+          class="hover:scale-[1.03] transition-transform duration-300"
+        >
+          <template #actions>
+            <div class="flex justify-end mt-5">
+              <button
+                class="bg-yellow-400 hover:bg-yellow-500 text-white w-12 h-12 rounded-full shadow-lg border-4 border-white flex items-center justify-center text-2xl transition-all duration-200 ease-in-out hover:rotate-6 active:scale-90 focus:ring-4 focus:ring-yellow-300"
+                @click="addToCart(product)"
+                :aria-label="`Add ${product.title} to cart`"
+              >
+                🛒
+              </button>
+            </div>
+          </template>
+        </ProductCard>
       </div>
     </div>
-
-    <!-- Product Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-      <ProductCard
-      v-for="product in filteredProducts"
-      :key="product.id"
-      :product="product"
-      @update="openUpdateModal"
-      @delete="openDeleteModal"
-      />
-      
-    </div>
   </div>
-  <UpdateProductModal
-    v-if="selectedProduct"
-    :product="selectedProduct"
-    :is-open="isUpdateModalOpen"
-    @close="closeUpdateModal"
-    @update-complete="fetchProducts"
-  />
-  <DeleteProductModal
-    v-if="productToDelete"
-    :product="productToDelete"
-    :is-open="isDeleteModalOpen"
-    @close="closeDeleteModal"
-    @delete-complete="fetchProducts"
-  />
 </template>
 
 <style scoped>
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Subtle entrance animation for grid items */
+.ProductCard-enter-active {
+  transition: all 0.3s ease;
+  transform: translateY(10px);
+  opacity: 0;
+}
+.ProductCard-enter-to {
+  transform: translateY(0);
+  opacity: 1;
 }
 </style>

@@ -3,9 +3,12 @@ import { ref } from "vue";
 import { auth } from "../lib/firebase";
 import { useRouter } from "vue-router";
 import { signOut } from "firebase/auth";
+import { useCartStore } from "../stores/cart";
+import CartModal from "../components/CartModal.vue";
 
 const router = useRouter();
 const isMenuOpen = ref(false);
+const cart = useCartStore();
 
 function toggleMenu() {
   isMenuOpen.value = !isMenuOpen.value;
@@ -63,9 +66,18 @@ async function signOutUser() {
 
           <!-- Shopping Cart & User -->
           <div class="hidden md:flex items-center space-x-4">
-            <button class="text-gray-600 hover:text-blue-600">
+            <button
+              class="text-gray-600 hover:text-blue-600"
+              @click="cart.openModal()"
+            >
               <span class="sr-only">Shopping Cart</span>
               🛒
+              <span
+                v-if="cart.items.length > 0"
+                class=" bg-yellow-400 text-white text-xs font-bold rounded-full px-2 py-0.5 border-2 border-white shadow"
+              >
+                {{ cart.items.length }}
+              </span>
             </button>
             <router-link
               to="/profile"
@@ -120,7 +132,18 @@ async function signOutUser() {
             >Contact</router-link
           >
           <div class="flex space-x-4 px-3 py-2">
-            <button class="text-gray-600 hover:text-blue-600">🛒</button>
+            <button
+              class="text-gray-600 hover:text-blue-600"
+              @click="cart.openModal"
+            >
+              🛒
+              <span
+                v-if="cart.items.length > 0"
+                class="bg-yellow-400 text-white text-xs font-bold rounded-full px-2 py-0.5 border-2 border-white shadow"
+              >
+                {{ cart.items.length }}
+              </span>
+            </button>
             <button class="text-gray-600 hover:text-blue-600">👤</button>
             <button
               @click="signOutUser"
@@ -138,4 +161,5 @@ async function signOutUser() {
       <router-view />
     </main>
   </div>
+  <CartModal />
 </template>
