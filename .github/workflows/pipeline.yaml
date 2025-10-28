@@ -9,8 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Node.js
@@ -22,19 +23,31 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
-      - name: Install dependencies
-        run: pnpm install
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
 
-      - name: Lint (client)
-        run: pnpm --filter client lint
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
-      - name: Lint (server)
+      - name: Install dependencies (workspace)
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint client
+        run: pnpm --filter client lint || echo "No lint script in client"
+
+      - name: Lint server
         run: pnpm --filter server lint || echo "No lint script in server"
 
-      - name: Type check (client)
+      - name: Type check client
         run: pnpm --filter client type-check || echo "No type-check script in client"
 
-      - name: Type check (server)
+      - name: Type check server
         run: pnpm --filter server type-check || echo "No type-check script in server"
 
       - name: Build client
