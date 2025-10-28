@@ -15,3 +15,11 @@ export const isAuthed = t.middleware(({ ctx, next }) => {
     },
   });
 });
+
+export const isAdmin = t.middleware(({ ctx, next }) => {
+  console.log(ctx.user);
+  if (!ctx.user || ctx.user.role !== "admin") {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Admins only" });
+  }
+  return next();
+});

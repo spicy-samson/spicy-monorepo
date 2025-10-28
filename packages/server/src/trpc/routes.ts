@@ -2,10 +2,19 @@ import { router, publicProcedure } from "../trpc";
 import { z } from "zod";
 import { db } from "../firebase";
 import type { Product } from "../types";
-import { isAuthed } from "./middleware";
+import { isAuthed, isAdmin } from "./middleware";
 // Return: Product[]
 
 export const appRouter = router({
+  adminOnlyData: publicProcedure
+    .use(isAuthed)
+    .use(isAdmin)
+    .query(({ ctx }) => {
+      // Only admins can access
+      //puta string tig rereturn mo, pero sa client tig eexpect mo object na hayop return `Secret for ${ctx.user.email} with the role of: ${ctx.user.role}`;
+      return ctx;
+    }),
+
   publicHello: publicProcedure.query(() => "👋 Public route!"),
 
   privateData: publicProcedure

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { trpc } from "../trpc";
 
 const privateData = ref<string | null>(null);
@@ -12,6 +12,20 @@ const privateRoute = async () => {
     error.value = e.message || "Failed to fetch private data.";
   }
 };
+
+interface User {
+  role?: string;
+}
+
+const user = ref<User | null>(null);
+
+onMounted(async () => {
+  const data = await trpc.adminOnlyData.query();
+  console.log(data)
+  user.value = { role: data.user.role };
+});
+
+const isAdmin = computed(() => user.value?.role === "admin");
 
 onMounted(() => {
   privateRoute();
@@ -44,6 +58,13 @@ onMounted(() => {
 
     <div v-if="privateData" class="mt-6 p-4 bg-blue-50 rounded text-blue-800">
       <strong>Private Data:</strong> {{ privateData }}
+    </div>
+
+    <div v-if="isAdmin">
+      <h6>{{ user }}</h6>
+    </div>
+    <div v-else>
+      <h6>You are not an admin.</h6>
     </div>
     <div v-if="error" class="mt-6 p-4 bg-red-50 rounded text-red-800">
       <strong>Error:</strong> {{ error }}
